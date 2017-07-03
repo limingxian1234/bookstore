@@ -131,8 +131,8 @@
 									<br />
 									<br />
 									<label>验证码：</label>
-									<input class="itxt" type="text" style="width: 150px;" name="code" id="code"/>
-									<img alt="" src="static/img/code.bmp" style="float: right; margin-right: 40px">									
+									<input class="itxt" type="text" style="width: 130px;" name="code" id="code"/>
+									<img id="code_img" alt="" src="kaptcha.jpg" style="float: right;  width: 100px; height:35px; margin-right: 50px;">								
 									<br />
 									<br />
 									<input type="submit" value="注册" id="sub_btn" />

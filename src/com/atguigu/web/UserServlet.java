@@ -10,6 +10,7 @@ import com.atguigu.bean.User;
 import com.atguigu.service.UserService;
 import com.atguigu.service.impl.UserServiceImpl;
 import com.atguigu.utils.WebUtils;
+import com.google.code.kaptcha.Constants;
 
 /**
  * Servlet implementation class UserServlet
@@ -54,12 +55,13 @@ public class UserServlet extends BaseServlet {
 //		String password = request.getParameter("password");
 //		String email = request.getParameter("email");
 		String code = request.getParameter("code");
-		
 		User t = WebUtils.copyParam2Bean(request.getParameterMap(), new User());
-		
+		//获取谷歌生成的验证码
+		String token = (String) request.getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
 //		4.如果验证码不为abcde说明验证码错误
-		if ("abcde".equalsIgnoreCase(code)) {
-			//
+		if (token != null && token.equalsIgnoreCase(code)) {
+			// 从Session中删除生成的验证码信息
+			request.getSession().removeAttribute(Constants.KAPTCHA_SESSION_KEY);
 //			2.判断用户名是否存在 ，
 			boolean usernameExist = userService.usernameExist(t.getUsername());
 			// 如果usernameExist==true说明用户名已存在
@@ -112,7 +114,12 @@ public class UserServlet extends BaseServlet {
 
 	}
 	
-	
+	protected void logout(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		//1.删除用户登录的信息，（从Sessoin域对象中删除）
+		request.getSession().removeAttribute("user");
+		response.sendRedirect(request.getContextPath());
+	}
 	protected void login(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -160,6 +167,9 @@ public class UserServlet extends BaseServlet {
 			request.getRequestDispatcher("/pages/user/login.jsp").forward(request, response);
 			
 		} else {
+			
+			//用户登录成功 之后。把User对象保存到session域对象中
+			request.getSession().setAttribute("user", user);
 			// 如果登录成功。跳转到login_success.jsp
 			System.out.println("登录成功！");
 			// 在转发中。/表示http://ip:port/工程名/
